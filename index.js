@@ -27,6 +27,17 @@ app.get("/posts",auth, async(req, res) => {
     }
 })
 
+app.get("/posts/top",auth, async(req, res) => {
+    const {userId} = req.body;
+    try {
+        const posts = await PostModel.find({userId}).limit(3).sort({no_of_comments:-1});
+        res.status(200).send({"posts": posts});
+        
+    } catch (err) {
+        res.send({"msg": err})
+    }
+})
+
 app.post("/posts/add",auth,  async(req, res) => {
     try {
         const post = new PostModel(req.body);
