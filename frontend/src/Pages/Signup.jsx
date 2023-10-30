@@ -12,15 +12,20 @@ const Signup = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        const postObj = {
+            name: name,
+            email: email,
+            password: password,
+            city: city,
+            gender: gender,
+            is_married: isMarried,
+            age:age 
+        }
 
-        axios.post("https://good-plum-crow-sock.cyclic.app/users/register", {
-            name,
-            email,
-            password,
-            city,
-            gender,
-            isMarried,
-            age
+        axios.post("https://elegant-rose-prawn.cyclic.app/users/register", postObj, {
+            headers: {
+                "Content-Type": "application/json"
+            }
         })
         .then((res) => {
             console.log(res)
