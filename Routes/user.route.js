@@ -1,21 +1,29 @@
 const express = require("express");
 const { UserModel } = require("../Model/user.model");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 const userRouter = express.Router();
 
 
 userRouter.post("/register", async (req, res) => {
-    const {email} = req.body;
+    const {email, password} = req.body;
     try {
         const alreadyUser = await UserModel.findOne({email});
         if(alreadyUser){
             res.status(200).send({"msg": "User already exist, please login"});
 
         }else{
-            const user = new UserModel(req.body);
-            await user.save();
-            res.status(200).send({"msg": "New User Registered!", "user": user});
+            bcrypt.hash(password, 5, async (err, hash)=> {
+                if(err){
+                    res.status(400).send({"msg": "User Not registred!"})
+                }else{
+                    req.body.password = hash;
+                    const user = new UserModel(req.body);
+                    await user.save();
+                    res.status(200).send({"msg": "New User Registered!", "user": user});
+                }
+            });
         }
         
     } catch (err) {
@@ -27,12 +35,14 @@ userRouter.post("/login", async (req, res) => {
     const {email, password} = req.body;
     try {
         const user = await UserModel.findOne({email});
-        if(user.password === password){
-            var token = jwt.sign({ userId: user._id }, process.env.key, {expiresIn: "7d"});
-            res.status(200).send({"msg": "Login Successful", "token": token})
-        }else{
-            res.status(400).send({"msg": "Password did not match!"})
-        }
+        bcrypt.compare(password, user.password, function(err, result) {
+            if(result){
+                var token = jwt.sign({ userId: user._id }, process.env.key, {expiresIn: "7d"});
+                res.status(200).send({"msg": "Login Successful", "token": token})
+            }else{
+                res.status(400).send({"msg": "Password did not match!"})
+            } 
+        });
         
     } catch (err) {
         res.send({"msg": err});

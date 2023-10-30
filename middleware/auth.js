@@ -4,7 +4,6 @@ require("dotenv").config();
 
 const auth = async (req, res, next) => {
     const token = req.headers.authorization.split(" ")[1];
-
     try {
         jwt.verify(token, process.env.key, function(err, decoded) {
             if(decoded){
