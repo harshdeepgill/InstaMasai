@@ -3,12 +3,14 @@ const { connection } = require("./db");
 const { userRouter } = require("./Routes/user.route");
 const { PostModel } = require("./Model/post.model");
 const { auth } = require("./middleware/auth");
+const cors = require("cors");
 
 
 const PORT = process.env.PORT || 8080
 
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 app.use("/users",userRouter);
