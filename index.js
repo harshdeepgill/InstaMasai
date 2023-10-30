@@ -16,9 +16,10 @@ app.use("/users",userRouter);
 // Restricted routes
 
 app.get("/posts",auth, async(req, res) => {
+    const page = req.query.page || 1;
     const {userId} = req.body;
     try {
-        const posts = await PostModel.find({userId});
+        const posts = await PostModel.find({userId}).skip((+page-1)*3).limit(3);
         res.status(200).send({"posts": posts});
         
     } catch (err) {
